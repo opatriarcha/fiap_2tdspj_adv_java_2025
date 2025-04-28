@@ -13,11 +13,29 @@ import java.util.stream.IntStream;
 @Configuration
 public class DataLoader {
 
-    private static final List<String> sampleNames = Arrays.asList(
-            "Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona", "George",
-            "Hannah", "Ian", "Julia", "Kevin", "Laura", "Michael", "Nina",
-            "Oscar", "Paula", "Quentin", "Rachel", "Samuel", "Tina"
+    List<String> sampleNames = Arrays.asList(
+            "Alice Smith", "Bob Johnson", "Charlie Brown", "Diana Miller", "Edward Davis",
+            "Fiona Wilson", "George Taylor", "Hannah Moore", "Ian Anderson", "Julia Thomas",
+            "Kevin Jackson", "Laura White", "Michael Harris", "Nina Martin", "Oscar Thompson",
+            "Paula Garcia", "Quentin Martinez", "Rachel Robinson", "Samuel Clark", "Tina Rodriguez",
+            "Alice Evans", "Bob Walker", "Charlie Hall", "Diana Allen", "Edward Young",
+            "Fiona Hernandez", "George King", "Hannah Wright", "Ian Lopez", "Julia Hill",
+            "Kevin Scott", "Laura Green", "Michael Adams", "Nina Baker", "Oscar Nelson",
+            "Paula Carter", "Quentin Mitchell", "Rachel Perez", "Samuel Roberts", "Tina Turner",
+            "Alice Cooper", "Bob Morgan", "Charlie Reed", "Diana Cook", "Edward Bell",
+            "Fiona Murphy", "George Bailey", "Hannah Rivera", "Ian Cooper", "Julia Richardson",
+            "Kevin Cox", "Laura Howard", "Michael Ward", "Nina Torres", "Oscar Peterson",
+            "Paula Gray", "Quentin Ramirez", "Rachel James", "Samuel Watson", "Tina Brooks",
+            "Alice Sanders", "Bob Price", "Charlie Bennett", "Diana Wood", "Edward Barnes",
+            "Fiona Ross", "George Henderson", "Hannah Coleman", "Ian Jenkins", "Julia Perry",
+            "Kevin Powell", "Laura Long", "Michael Patterson", "Nina Hughes", "Oscar Flores",
+            "Paula Washington", "Quentin Butler", "Rachel Simmons", "Samuel Foster", "Tina Gonzales",
+            "Alice Bryant", "Bob Alexander", "Charlie Russell", "Diana Griffin", "Edward Diaz",
+            "Fiona Hayes", "George Myers", "Hannah Ford", "Ian Hamilton", "Julia Graham",
+            "Kevin Sullivan", "Laura Wallace", "Michael West", "Nina Cole", "Oscar Jordan",
+            "Paula Reynolds", "Quentin Fisher", "Rachel Ellis", "Samuel Harrison", "Tina Gibson"
     );
+
 
     private static final List<String> sampleWords = Arrays.asList(
             "tech", "finance", "education", "music", "gaming", "travel",
