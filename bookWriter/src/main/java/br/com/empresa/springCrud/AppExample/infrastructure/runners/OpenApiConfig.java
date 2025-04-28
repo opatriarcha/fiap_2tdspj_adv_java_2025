@@ -1,4 +1,4 @@
-package br.com.empresa.springCrud.AppExample.runners;
+package br.com.empresa.springCrud.AppExample.infrastructure.runners;
 
 //import io.swagger.v3.oas.models.OpenAPI;
 //import io.swagger.v3.oas.models.info.Info;

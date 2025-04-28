@@ -1,4 +1,4 @@
-package br.com.empresa.springCrud.AppExample.runners;
+package br.com.empresa.springCrud.AppExample.infrastructure.runners;
 
 import br.com.empresa.springCrud.AppExample.domainmodel.*;
 import br.com.empresa.springCrud.AppExample.repositories.*;
