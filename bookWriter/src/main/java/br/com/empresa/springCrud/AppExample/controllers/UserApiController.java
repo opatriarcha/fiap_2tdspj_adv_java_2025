@@ -4,10 +4,12 @@ import br.com.empresa.springCrud.AppExample.domainmodel.User;
 import br.com.empresa.springCrud.AppExample.dtos.UserDTO;
 import br.com.empresa.springCrud.AppExample.services.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +33,9 @@ public class UserApiController {
         this.userService = userService;
     }
 
-    @Operation(summary = "Listar todos os usuários", description = "Retorna uma lista completa de usuários")
+    @Operation(summary = "Listar todos os usuários")
     @GetMapping
+    @Cacheable(value = "usersCache", key = "'findAll'")
     public ResponseEntity<List<UserDTO>> findAll() {
         List<UserDTO> users = userService.findAll()
                 .stream()
@@ -41,29 +44,28 @@ public class UserApiController {
         return ResponseEntity.ok(users);
     }
 
-    @Operation(summary = "Listar usuários paginados", description = "Retorna uma página de usuários de acordo com os parâmetros de paginação")
+    @Operation(summary = "Listar usuários paginados")
     @GetMapping("/paged")
+    @Cacheable(value = "usersCache", key = "'findAllPaged-' + #pageable.pageNumber")
     public ResponseEntity<Page<UserDTO>> findAllPaged(Pageable pageable) {
         Page<UserDTO> usersPage = userService.findAllPaged(pageable)
                 .map(UserDTO::fromEntity);
         return ResponseEntity.ok(usersPage);
     }
 
-    @Operation(summary = "Buscar usuário por ID", description = "Busca um usuário específico usando seu ID")
+    @Operation(summary = "Buscar usuário por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(
-            @Parameter(description = "ID do usuário a ser buscado", required = true)
-            @PathVariable UUID id) {
+    @Cacheable(value = "usersCache", key = "#id")
+    public ResponseEntity<UserDTO> findById(@PathVariable UUID id) {
         return userService.findById(id)
                 .map(user -> ResponseEntity.ok(UserDTO.fromEntity(user)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Criar um novo usuário", description = "Cria e retorna um novo usuário")
+    @Operation(summary = "Criar novo usuário")
     @PostMapping
-    public ResponseEntity<UserDTO> save(
-            @Parameter(description = "Objeto de usuário a ser criado", required = true)
-            @Valid @RequestBody UserDTO userDTO) {
+    @CachePut(value = "usersCache", key = "#result.body.id")
+    public ResponseEntity<UserDTO> save(@Valid @RequestBody UserDTO userDTO) {
         User user = UserDTO.toEntity(userDTO);
         User savedUser = userService.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -73,13 +75,10 @@ public class UserApiController {
         return ResponseEntity.created(location).body(UserDTO.fromEntity(savedUser));
     }
 
-    @Operation(summary = "Atualizar um usuário existente", description = "Atualiza completamente um usuário já existente")
+    @Operation(summary = "Atualizar usuário")
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> update(
-            @Parameter(description = "ID do usuário a ser atualizado", required = true)
-            @PathVariable UUID id,
-            @Parameter(description = "Dados atualizados do usuário", required = true)
-            @Valid @RequestBody UserDTO userDTO) {
+    @CachePut(value = "usersCache", key = "#id")
+    public ResponseEntity<UserDTO> update(@PathVariable UUID id, @Valid @RequestBody UserDTO userDTO) {
         if (!userService.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -89,11 +88,10 @@ public class UserApiController {
         return ResponseEntity.ok(UserDTO.fromEntity(updatedUser));
     }
 
-    @Operation(summary = "Excluir um usuário", description = "Remove um usuário usando seu ID")
+    @Operation(summary = "Deletar usuário")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(
-            @Parameter(description = "ID do usuário a ser excluído", required = true)
-            @PathVariable UUID id) {
+    @CacheEvict(value = "usersCache", key = "#id")
+    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
         if (!userService.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
