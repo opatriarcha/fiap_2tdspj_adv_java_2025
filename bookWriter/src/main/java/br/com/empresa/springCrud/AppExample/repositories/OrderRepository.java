@@ -3,6 +3,7 @@ package br.com.empresa.springCrud.AppExample.repositories;
 import br.com.empresa.springCrud.AppExample.domainmodel.Order;
 import br.com.empresa.springCrud.AppExample.domainmodel.OrderKey;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, OrderKey>,
     List<Order> findByProductNameContainingIgnoreCase(String productName);
 
     // JPQL personalizado: Busca pelo preço
-    @org.springframework.data.jpa.repository.Query("SELECT o FROM Order o WHERE o.price >= :price")
+    @Query("SELECT o FROM Order o WHERE o.price >= :price")
     List<Order> findOrdersWithPriceGreaterThanEqual(double price);
 }

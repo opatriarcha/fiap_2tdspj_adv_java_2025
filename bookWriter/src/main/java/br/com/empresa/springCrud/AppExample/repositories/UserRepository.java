@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
+
+
     @Override
     @QueryHints(@QueryHint(name = "org.hibernate.cacheable", value = "true"))
     List<User> findAll();
+
+    List<User> findByEmail(final String email);
+
 }

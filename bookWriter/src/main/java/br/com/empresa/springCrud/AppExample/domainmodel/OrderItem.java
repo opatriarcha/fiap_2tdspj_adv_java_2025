@@ -26,7 +26,6 @@ public class OrderItem {
     private int quantity;
 
     @ManyToOne()
-//    @MapsId("orderId")
     @JoinColumns({
             @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false),
             @JoinColumn(name = "order_id", referencedColumnName = "order_id",insertable = false, updatable = false)

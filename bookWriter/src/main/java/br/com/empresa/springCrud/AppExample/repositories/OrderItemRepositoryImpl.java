@@ -22,24 +22,42 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
 
     @Override
     public List<OrderItem> findByQuantityGreaterThanQueryDsl(int quantityMin) {
+
+        //Instancio o QOrderItem ou qualquer classe que comece com Q.
         QOrderItem orderItem = QOrderItem.orderItem;
+
+        //CRIANDO JPAQueryFactory a aprtiri do PersistenceContext.
         JPAQueryFactory factory = new JPAQueryFactory(entityManager);
+
+        //criando a query aqui
         return factory.selectFrom(orderItem)
                 .where(orderItem.quantity.gt(quantityMin))
                 .fetch();
+
+
     }
 
     @Override
     public List<OrderItem> findByQuantityGreaterThanCriteria(int quantityMin) {
+        // CRIO O CRITERIA BUILDER
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OrderItem> cq = cb.createQuery(OrderItem.class);
-        Root<OrderItem> root = cq.from(OrderItem.class);
 
+        //CRIO O CRITERIA QUERY
+        CriteriaQuery<OrderItem> query = cb.createQuery(OrderItem.class);
+
+        //QUAL A CLAUSULA FROM?
+        Root<OrderItem> root = query.from(OrderItem.class);
+
+        //CRIA A LISTA DE PREDICADOS
         List<Predicate> predicates = new ArrayList<>();
+
+        //ADICIONA NOVO PREDICADO NA LISTA
         predicates.add(cb.greaterThan(root.get("quantity"), quantityMin));
 
-        cq.select(root).where(predicates.toArray(new Predicate[0]));
+        //DEFINO A SELECAO
+        query.select(root).where(predicates.toArray(new Predicate[0]));
 
-        return entityManager.createQuery(cq).getResultList();
+        //EXECUTO A QUERY RETORNANDO O RESULTSETLIST
+        return entityManager.createQuery(query).getResultList();
     }
 }

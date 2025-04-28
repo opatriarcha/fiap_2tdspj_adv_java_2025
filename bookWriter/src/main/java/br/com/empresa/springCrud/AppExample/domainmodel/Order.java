@@ -14,10 +14,6 @@ import java.util.Set;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Order {
     @EmbeddedId
-//    @AttributeOverrides({
-//            @AttributeOverride(name = "userId", column = @Column(name = "user_id")),
-//            @AttributeOverride(name = "orderId", column = @Column(name = "order_id"))
-//    })
     @Getter @Setter
     private OrderKey id;
 
@@ -31,7 +27,6 @@ public class Order {
     private double price;
 
     @ManyToOne
-//    @MapsId("userId")
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     @Getter @Setter
     private User user;
