@@ -2,10 +2,12 @@ package br.com.empresa.springCrud.AppExample.controllers;
 
 import br.com.empresa.springCrud.AppExample.domainmodel.User;
 import br.com.empresa.springCrud.AppExample.dtos.UserDTO;
+import br.com.empresa.springCrud.AppExample.repositories.UserRepository;
 import br.com.empresa.springCrud.AppExample.services.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,10 +30,12 @@ import java.util.stream.Collectors;
 public class UserApiController {
 
     private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserApiController(UserServiceImpl userService) {
+    public UserApiController(UserServiceImpl userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Operation(summary = "Listar todos os usuários")
@@ -97,5 +102,17 @@ public class UserApiController {
         }
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/test-cache")
+    public ResponseEntity<String> testCache() {
+        long start = System.currentTimeMillis();
+        List<User> users = userRepository.findAll();
+        long end = System.currentTimeMillis();
+
+        long elapsed = end - start;
+        System.out.println("Tempo de execução: " + elapsed + " ms ({} usuários)");
+
+        return ResponseEntity.ok("Executado em " + elapsed + " ms " + users.size() + "usuários encontrados: "  );
     }
 }

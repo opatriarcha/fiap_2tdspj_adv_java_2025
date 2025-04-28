@@ -2,12 +2,16 @@ package br.com.empresa.springCrud.AppExample.domainmodel;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @Table(name="ORDERS")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Order {
     @EmbeddedId
 //    @AttributeOverrides({
