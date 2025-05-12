@@ -26,12 +26,15 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom {
         //Instancio o QOrderItem ou qualquer classe que comece com Q.
         QOrderItem orderItem = QOrderItem.orderItem;
 
-        //CRIANDO JPAQueryFactory a aprtiri do PersistenceContext.
+        //CRIANDO JPAQueryFactory a partir do PersistenceContext.
         JPAQueryFactory factory = new JPAQueryFactory(entityManager);
 
         //criando a query aqui
         return factory.selectFrom(orderItem)
-                .where(orderItem.quantity.gt(quantityMin))
+                .where(
+                        orderItem.quantity.gt(quantityMin)
+                                .and(orderItem.quantity.loe(10000))
+                )
                 .fetch();
 
 

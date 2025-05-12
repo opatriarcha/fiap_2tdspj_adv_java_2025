@@ -2,6 +2,8 @@ package br.com.empresa.springCrud.AppExample.services;
 
 import br.com.empresa.springCrud.AppExample.domainmodel.Order;
 import br.com.empresa.springCrud.AppExample.domainmodel.OrderKey;
+import br.com.empresa.springCrud.AppExample.domainmodel.QOrder;
+import br.com.empresa.springCrud.AppExample.domainmodel.QOrderItem;
 import br.com.empresa.springCrud.AppExample.repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -93,5 +95,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> searchByQuantityGreaterThanCriteria(int quantityMin) {
         return orderRepositoryImpl.findByQuantityGreaterThanCriteria(quantityMin);
+    }
+
+    public void qqermerda(){
+        QOrderItem orderItem = QOrderItem.orderItem;
+
     }
 }

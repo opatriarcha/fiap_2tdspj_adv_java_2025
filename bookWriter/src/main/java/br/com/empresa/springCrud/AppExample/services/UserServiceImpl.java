@@ -1,7 +1,13 @@
 package br.com.empresa.springCrud.AppExample.services;
 
+import br.com.empresa.springCrud.AppExample.domainmodel.QUser;
 import br.com.empresa.springCrud.AppExample.domainmodel.User;
 import br.com.empresa.springCrud.AppExample.repositories.UserRepository;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +24,11 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public List<User> findAll() {
@@ -74,5 +83,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsById(UUID id) {
         return userRepository.existsById(id);
+    }
+
+    public Iterable<User> searchByNameLike( final String name){
+        QUser user = QUser.user;
+        return this.userRepository.findAll( user.name.like(name));
     }
 }
