@@ -5,6 +5,7 @@ import br.com.empresa.springCrud.AppExample.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,7 +53,9 @@ public class DataLoader {
             PostRepository postRepository,
             TagRepository tagRepository,
             OrderRepository orderRepository,
-            OrderItemRepository orderItemRepository
+            OrderItemRepository orderItemRepository,
+            PasswordEncoder passwordEncoder
+
     ) {
         return args -> {
             // Create Roles
@@ -90,6 +93,20 @@ public class DataLoader {
 
                 users.add(savedUser);
             });
+            String name = "admin";
+            User user2 = new User();
+            user2.setName(name);
+            user2.setEmail("orlando@gmail.com");
+            user2.setPassword(passwordEncoder.encode("masterkey"));
+            user2.setRoles(Set.of(finalRoles.get(random.nextInt(finalRoles.size()))));
+            users.add(user2);
+            User savedUser = userRepository.save(user2);
+
+            Profile profile = new Profile();
+            profile.setBio("Lover of " + sampleWords.get(random.nextInt(sampleWords.size())) + " and " + sampleWords.get(random.nextInt(sampleWords.size())));
+            profile.setProfilePictureUrl("https://picsum.photos/id/" + (random.nextInt(100) + 1) + "/200/300");
+            profile.setUser(savedUser);
+            profileRepository.save(profile);
 
             // Create Posts
             List<Tag> finalTags = tags;
@@ -127,6 +144,26 @@ public class DataLoader {
                 item.setOrder(order);
                 orderItemRepository.save(item);
             });
-        };
-    }
-}
+
+//            Role userRole = new Role();
+//            userRole.setName("ROLE_USER");
+//            roleRepository.save(userRole);
+//
+//            User user = new User();
+//            user.setId(UUID.randomUUID());
+//            user.setName("admin");
+//            user.setEmail("admin@example.com");
+//            user.setPassword(passwordEncoder.encode("admin123"));
+//            user.setRoles(Set.of(userRole));
+//
+//            Profile profile = new Profile();
+//            profile.setBio("Administrador do sistema");
+//            profile.setUser(user); // bidirecional
+//            user.setProfile(profile);
+//
+//            userRepository.save(user);
+//
+//            System.out.println(">>> Usuário admin criado com sucesso");
+//        };
+    };
+}}
