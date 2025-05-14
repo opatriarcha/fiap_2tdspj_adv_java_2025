@@ -2,16 +2,19 @@ package br.com.empresa.springCrud.AppExample.controllers.infraestructure;
 
 import br.com.empresa.springCrud.AppExample.dtos.AuthRequest;
 import br.com.empresa.springCrud.AppExample.dtos.AuthResponse;
+import br.com.empresa.springCrud.AppExample.dtos.TokenRefreshRequest;
 import br.com.empresa.springCrud.AppExample.infrastructure.config.JwtHelper;
 import br.com.empresa.springCrud.AppExample.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +26,7 @@ public class AuthController {
 
     @Autowired private AuthenticationManager authenticationManager;
     @Autowired private JwtHelper jwtHelper;
-    @Autowired private UserService userService;
+    @Autowired private UserDetailsService userDetailsService;
 
 //    curl -X POST http://localhost:8080/auth/login \
 //            -H "Content-Type: application/json" \
@@ -33,8 +36,26 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+
         UserDetails user = (UserDetails) auth.getPrincipal();
-        String token = jwtHelper.generateToken(user);
-        return ResponseEntity.ok(new AuthResponse(token));
+
+        String accessToken = jwtHelper.generateToken(user);
+        String refreshToken = jwtHelper.generateRefreshToken(user); // novo método
+
+        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody TokenRefreshRequest request) {
+        String refreshToken = request.refreshToken();
+
+        String username = jwtHelper.extractUsername(refreshToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (jwtHelper.isTokenValid(refreshToken, userDetails)) {
+            String newAccessToken = jwtHelper.generateToken(userDetails);
+            return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshToken));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token inválido ou expirado.");
+        }
     }
 }

@@ -39,6 +39,14 @@ public class JwtHelper {
         return Jwts.parserBuilder().setSigningKey(getSigningKey())
                 .build().parseClaimsJws(token).getBody().getExpiration().before(new Date());
     }
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 604800000)) // 7 dias
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
