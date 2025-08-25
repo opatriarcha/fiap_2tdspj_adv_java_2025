@@ -74,6 +74,4 @@ public class TaskController {
         model.addAttribute("priorities", TaskPriority.values());
         return "tasks/form";
     }
-
-
 }
