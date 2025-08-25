@@ -63,8 +63,17 @@ public class TaskController {
         return "tasks/view";
     }
 
-    @PostMapping("/edit/{id}")
-
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable("id") Long id, Model model){
+        Task newTask = this.taskService.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Task not found " + id.toString()
+                )
+        );
+        model.addAttribute("task", newTask);
+        model.addAttribute("statuses", TaskStatus.values());
+        model.addAttribute("priorities", TaskPriority.values());
+        return "tasks/form";
+    }
 
 
 }
