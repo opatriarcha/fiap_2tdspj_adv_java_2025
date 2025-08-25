@@ -17,15 +17,22 @@
 
         <label>Descrição:</label>
         <textarea th:field="*{description}"></textarea>
+        <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
 
         <label>Data de Criação:</label>
         <input type="date" th:field="*{creationDate}"/>
+        <span class="error" th:if="${#fields.hasErrors('creationDate')}" th:errors="*{creationDate}"></span>
+
 
         <label>Data de Conclusão:</label>
         <input type="date" th:field="*{completionDate}"/>
+        <span class="error" th:if="${#fields.hasErrors('completionDate')}" th:errors="*{completionDate}"></span>
+
 
         <label>Prazo:</label>
         <input type="date" th:field="*{dueDate}"/>
+        <span class="error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></span>
+
 
         <label>Status:</label>
         <select th:field="*{status}">

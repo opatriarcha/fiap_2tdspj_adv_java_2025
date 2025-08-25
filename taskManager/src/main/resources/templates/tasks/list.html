@@ -27,12 +27,12 @@
             <td th:text="${task.dueDate}"></td>
             <td th:text="${task.status}"></td>
             <td>
-    <div class="action-buttons">
-        <a th:href="@{'/tasks/view/' + ${task.id}}">👁️</a>
-        <a th:href="@{'/tasks/edit/' + ${task.id}}">✏️</a>
-        <a th:href="@{'/tasks/delete/' + ${task.id}}" data-confirm="Deseja realmente apagar esta tarefa?">🗑️</a>
-    </div>
-</td>
+                <div class="action-buttons">
+                    <a th:href="@{'/tasks/view/' + ${task.id}}">👁️</a>
+                    <a th:href="@{'/tasks/edit/' + ${task.id}}">✏️</a>
+                    <a th:href="@{'/tasks/delete/' + ${task.id}}" data-confirm="Deseja realmente apagar esta tarefa?">🗑️</a>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>
