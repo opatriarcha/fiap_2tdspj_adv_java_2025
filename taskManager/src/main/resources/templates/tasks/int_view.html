@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="#{task.view.title}">Visualizar Tarefa</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <!-- Seletor de idioma (links estáticos para a própria rota) -->
+    <nav style="display:flex;gap:.5rem;justify-content:flex-end;">
+        <a th:href="@{/tasks/view/{id}(id=${task.id},lang='pt_BR')}" hreflang="pt-BR">PT</a> |
+        <a th:href="@{/tasks/view/{id}(id=${task.id},lang='en')}" hreflang="en">EN</a>
+    </nav>
+
+    <!-- Título com parâmetro -->
+    <h1 th:text="#{task.view.heading(${task.id})}">Tarefa #1</h1>
+
+    <ul>
+        <li>
+            <strong th:text="#{task.field.title}">Título</strong>:
+            <span th:text="${task.title}">-</span>
+        </li>
+
+        <li>
+            <strong th:text="#{task.field.description}">Descrição</strong>:
+            <span th:text="${task.description}">-</span>
+        </li>
+
+        <li>
+            <strong th:text="#{task.field.creationDate}">Data de Criação</strong>:
+            <span th:text="${#temporals.format(task.creationDate, 'LONG')}">01/01/2025</span>
+        </li>
+
+        <li>
+            <strong th:text="#{task.field.dueDate}">Prazo</strong>:
+            <span th:text="${#temporals.format(task.dueDate, 'LONG')}">05/01/2025</span>
+        </li>
+
+        <li>
+            <strong th:text="#{task.field.status}">Status</strong>:
+            <span th:text="${#messages.msgOrNull('task.status.' + task.status) ?: task.status}">Em andamento</span>
+        </li>
+
+        <li>
+            <strong th:text="#{task.field.priority}">Prioridade</strong>:
+            <span th:text="${#messages.msgOrNull('task.priority.' + task.priority) ?: task.priority}">Alta</span>
+        </li>
+    </ul>
+
+    <a th:href="@{/tasks}" th:text="#{generic.back}">Voltar</a>
+</div>
+</body>
+</html>

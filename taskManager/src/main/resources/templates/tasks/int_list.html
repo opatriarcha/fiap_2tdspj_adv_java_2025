@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="#{task.list.title}">Lista de Tarefas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+    <!-- Seletor de idioma (Opção C: links estáticos para /tasks) -->
+    <nav style="display:flex;gap:.5rem;justify-content:flex-end;">
+        <a th:href="@{/tasks(lang='pt_BR')}" hreflang="pt-BR">PT</a> |
+        <a th:href="@{/tasks(lang='en')}" hreflang="en">EN</a>
+    </nav>
+
+    <h1 th:text="#{task.list.heading}">Lista de tarefas</h1>
+
+    <a th:href="@{/tasks/new}" th:text="#{task.list.new}">Nova Tarefa</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th th:text="#{task.list.th.id}">ID</th>
+            <th th:text="#{task.list.th.title}">Título</th>
+            <th th:text="#{task.list.th.creationDate}">Data de Criação</th>
+            <th th:text="#{task.list.th.dueDate}">Prazo</th>
+            <th th:text="#{task.list.th.status}">Status</th>
+            <th th:text="#{task.list.th.actions}">Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="task : ${tasks}">
+            <td th:text="${task.id}">1</td>
+            <td th:text="${task.title}">Título</td>
+
+            <!-- Datas localizadas -->
+            <td th:text="${#temporals.format(task.creationDate, 'dd/MM/uuuu')}"></td>
+            <td th:text="${#temporals.format(task.dueDate,    'dd/MM/uuuu')}"></td>
+
+            <!-- Status traduzido com fallback -->
+            <td th:text="${#messages.msgOrNull('task.status.' + task.status) ?: task.status}">Em andamento</td>
+
+            <td>
+                <div class="action-buttons" style="display:flex; gap:.5rem;">
+                    <a th:href="@{'/tasks/view/' + ${task.id}}"
+                       th:aria-label="#{generic.view}">
+                        👁 <span th:text="#{generic.view}">View</span>
+                    </a>
+                    <a th:href="@{'/tasks/edit/' + ${task.id}}"
+                       th:aria-label="#{generic.edit}">
+                        ✏️ <span th:text="#{generic.edit}">Edit</span>
+                    </a>
+                    <a th:href="@{'/tasks/delete/' + ${task.id}}"
+                       th:aria-label="#{generic.remove}"
+                       th:attr="data-confirm=#{dialog.confirm.delete}">
+                        🗑️ <span th:text="#{generic.remove}">Remove</span>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Toast (mensagem do backend via ?success=...) -->
+<div id="toast" class="toast-hidden" th:text="${param.success} ?: ''"></div>
+
+<!-- Diálogo -->
+<div id="dialog-overlay" style="display:none;"></div>
+<div id="custom-dialog" style="display:none;">
+    <div class="dialog-content">
+        <p id="dialog-message">...</p>
+        <div class="dialog-buttons">
+            <button id="confirm-yes">...</button>
+            <button id="confirm-no">...</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const i18n = {
+        yes: [[#{generic.yes}]],
+    cancel: [[#{generic.cancel}]]
+    };
+
+    function showCustomDialog(message, onConfirm) {
+        document.getElementById('dialog-message').textContent = message;
+        document.getElementById('confirm-yes').textContent = i18n.yes;
+        document.getElementById('confirm-no').textContent = i18n.cancel;
+        document.getElementById('dialog-overlay').style.display = 'block';
+        document.getElementById('custom-dialog').style.display = 'block';
+
+        const yesBtn = document.getElementById('confirm-yes');
+        const noBtn = document.getElementById('confirm-no');
+
+        yesBtn.onclick = () => { closeDialog(); onConfirm(); };
+        noBtn.onclick = closeDialog;
+    }
+
+    function closeDialog() {
+        document.getElementById('dialog-overlay').style.display = 'none';
+        document.getElementById('custom-dialog').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirmação i18n a partir de data-confirm
+        document.querySelectorAll('a[data-confirm]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                const msg  = this.getAttribute('data-confirm');
+                showCustomDialog(msg, () => window.location.href = href);
+            });
+        });
+
+        // Toast
+        const toast = document.getElementById("toast");
+        if (toast.textContent.trim() !== "") {
+            toast.classList.remove("toast-hidden");
+            toast.classList.add("toast-show");
+            setTimeout(() => {
+                toast.classList.remove("toast-show");
+                toast.classList.add("toast-hidden");
+            }, 3000);
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

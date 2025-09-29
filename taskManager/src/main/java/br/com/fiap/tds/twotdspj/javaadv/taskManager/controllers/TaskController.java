@@ -24,7 +24,7 @@ public class TaskController {
     @GetMapping
     public String listTasks(Model model){
         model.addAttribute("tasks", this.taskService.findAll());
-        return "tasks/list";
+        return "tasks/int_list";
     }
 
     @GetMapping("/new")
@@ -32,7 +32,7 @@ public class TaskController {
         model.addAttribute("task", new Task());
         model.addAttribute("statuses", TaskStatus.values());
         model.addAttribute("priorities", TaskPriority.values());
-        return  "tasks/form";
+        return  "tasks/int_form";
     }
 
     @PostMapping("/save")
@@ -41,7 +41,7 @@ public class TaskController {
         if (bindingResult.hasErrors()){
             model.addAttribute("statuses", TaskStatus.values());
             model.addAttribute("priorities", TaskPriority.values());
-            return "tasks/form";
+            return "tasks/int_form";
         }
         this.taskService.save(task);
         return "redirect:/tasks";
@@ -60,7 +60,7 @@ public class TaskController {
             )
         );
         model.addAttribute("task", task);
-        return "tasks/view";
+        return "tasks/int_view";
     }
 
     @GetMapping("/edit/{id}")
@@ -72,6 +72,6 @@ public class TaskController {
         model.addAttribute("task", newTask);
         model.addAttribute("statuses", TaskStatus.values());
         model.addAttribute("priorities", TaskPriority.values());
-        return "tasks/form";
+        return "tasks/int_form";
     }
 }
