@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="#{app.title}">Gerenciamento de Tarefas</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+
+    <!-- Seletor de idioma (sem #httpServletRequest) -->
+    <nav style="display:flex;gap:.5rem;justify-content:flex-end;">
+        <!-- NOVA tarefa -->
+        <a th:if="${task.id == null}" th:href="@{/tasks/new(lang='pt_BR')}" hreflang="pt-BR">PT</a>
+        <span th:if="${task.id == null}"> | </span>
+        <a th:if="${task.id == null}" th:href="@{/tasks/new(lang='en')}" hreflang="en">EN</a>
+
+        <!-- EDIÇÃO -->
+        <a th:if="${task.id != null}" th:href="@{/tasks/edit/{id}(id=${task.id},lang='pt_BR')}" hreflang="pt-BR">PT</a>
+        <span th:if="${task.id != null}"> | </span>
+        <a th:if="${task.id != null}" th:href="@{/tasks/edit/{id}(id=${task.id},lang='en')}" hreflang="en">EN</a>
+    </nav>
+
+    <h1 th:text="${task.id} == null ? #{task.form.heading.new} : #{task.form.heading.edit}">Nova Tarefa</h1>
+
+    <form th:action="@{/tasks/save}" th:object="${task}" method="POST">
+        <input type="hidden" th:field="*{id}" />
+
+        <label th:for="${#ids.next('title')}" th:text="#{task.field.title}">Título</label>
+        <input type="text" th:field="*{title}" th:placeholder="#{task.field.title.placeholder}" />
+        <span class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+
+        <label th:for="${#ids.next('description')}" th:text="#{task.field.description}">Descrição</label>
+        <input type="text" th:field="*{description}" th:placeholder="#{task.field.description.placeholder}" />
+        <span class="error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+
+        <label th:for="${#ids.next('creationDate')}" th:text="#{task.field.creationDate}">Data de Criação</label>
+        <input type="date" th:field="*{creationDate}" />
+        <span class="error" th:if="${#fields.hasErrors('creationDate')}" th:errors="*{creationDate}"></span>
+
+        <label th:for="${#ids.next('completionDate')}" th:text="#{task.field.completionDate}">Data de Conclusão</label>
+        <input type="date" th:field="*{completionDate}" />
+        <span class="error" th:if="${#fields.hasErrors('completionDate')}" th:errors="*{completionDate}"></span>
+
+        <label th:for="${#ids.next('dueDate')}" th:text="#{task.field.dueDate}">Prazo</label>
+        <input type="date" th:field="*{dueDate}" />
+        <span class="error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></span>
+
+        <label th:for="${#ids.next('status')}" th:text="#{task.field.status}">Status</label>
+        <select th:field="*{status}">
+            <option th:each="s : ${statuses}"
+                    th:value="${s}"
+                    th:text="${#messages.msgOrNull('task.status.' + s) ?: s}">
+            </option>
+        </select>
+
+        <label th:for="${#ids.next('priority')}" th:text="#{task.field.priority}">Prioridade</label>
+        <select th:field="*{priority}">
+            <option th:each="p : ${priorities}"
+                    th:value="${p}"
+                    th:text="${#messages.msgOrNull('task.priority.' + p) ?: p}">
+            </option>
+        </select>
+
+        <div style="margin-top:1rem; display:flex; gap:.5rem;">
+            <button type="button" id="btn-save" th:text="#{generic.save}">Salvar</button>
+            <a th:href="@{/tasks}" th:text="#{generic.back}">Voltar</a>
+        </div>
+    </form>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast-hidden" th:text="${param.success} ?: ''"></div>
+
+<!-- Diálogo -->
+<div id="dialog-overlay" style="display:none;"></div>
+<div id="custom-dialog" style="display:none;">
+    <div class="dialog-content">
+        <p id="dialog-message"></p>
+        <div class="dialog-buttons">
+            <button id="confirm-yes"></button>
+            <button id="confirm-no"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const i18n = {
+        confirmSave: [[#{dialog.confirm.save}]],
+    yes: [[#{generic.yes}]],
+    cancel: [[#{generic.cancel}]]
+    };
+
+    function showCustomDialog(message, onConfirm) {
+        document.getElementById('dialog-message').textContent = message;
+        document.getElementById('confirm-yes').textContent = i18n.yes;
+        document.getElementById('confirm-no').textContent = i18n.cancel;
+        document.getElementById('dialog-overlay').style.display = 'block';
+        document.getElementById('custom-dialog').style.display = 'block';
+
+        const yesBtn = document.getElementById('confirm-yes');
+        const noBtn = document.getElementById('confirm-no');
+
+        yesBtn.onclick = () => { closeDialog(); onConfirm(); };
+        noBtn.onclick = closeDialog;
+    }
+
+    function closeDialog() {
+        document.getElementById('dialog-overlay').style.display = 'none';
+        document.getElementById('custom-dialog').style.display = 'none';
+    }
+
+    function confirmarEnvio() {
+        showCustomDialog(i18n.confirmSave, () => {
+            document.querySelector("form").submit();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('btn-save').addEventListener('click', confirmarEnvio);
+
+        const toast = document.getElementById("toast");
+        if (toast.textContent.trim() !== "") {
+            toast.classList.remove("toast-hidden");
+            toast.classList.add("toast-show");
+            setTimeout(() => {
+                toast.classList.remove("toast-show");
+                toast.classList.add("toast-hidden");
+            }, 3000);
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
