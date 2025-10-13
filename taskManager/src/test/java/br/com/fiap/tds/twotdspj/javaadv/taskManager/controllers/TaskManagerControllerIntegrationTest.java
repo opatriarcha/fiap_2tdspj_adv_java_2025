@@ -33,54 +33,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
-@Import(TaskManagerControllerTest.MvcTestConfig.class)
-public class TaskManagerControllerTest {
+@Import(TaskService.class)
+public class TaskManagerControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private TaskService taskService;
-
-    @TestConfiguration
-    static class MvcTestConfig {
-        @Bean
-        @Primary
-        TaskService taskService() {
-            return Mockito.mock(TaskService.class);
-        }
-
-        @Bean
-        @Primary
-        SpringResourceTemplateResolver thymeleafTemplateResolver() {
-            SpringResourceTemplateResolver r = new SpringResourceTemplateResolver();
-            r.setSuffix(".html");
-            r.setPrefix("classpath:/templates/");
-            r.setTemplateMode("HTML");
-            r.setCharacterEncoding("UTF-8");
-            r.setCacheable(false);
-            return r;
-        }
-
-        @Bean
-        @Primary
-        SpringTemplateEngine thymeleafTemplateEngine(Set<ITemplateResolver> templateResolvers) {
-            SpringTemplateEngine t = new SpringTemplateEngine();
-            t.setTemplateResolvers(templateResolvers);
-            t.setTemplateResolver(thymeleafTemplateResolver());
-            t.setEnableSpringELCompiler(true);
-            return t;
-        }
-
-        @Bean
-        @Primary
-        ThymeleafViewResolver thymeleafViewResolver(SpringTemplateEngine t) {
-            ThymeleafViewResolver v = new ThymeleafViewResolver();
-            v.setTemplateEngine(t);
-            v.setCharacterEncoding("UTF-8");
-            return v;
-        }
-    }
 
     private Task task(Long id, String title) {
         Task task = new Task();
@@ -100,23 +60,22 @@ public class TaskManagerControllerTest {
         @Test
         @DisplayName("Dado tarefas existentes, quando listar, entáo 200, refirecionar para view tasks/list e model tasks")
         void shouldReturnAllTasks() throws Exception {
-            BDDMockito.given(taskService.findAll())
-                    .willReturn(
-                            List.of(
-                                    task(1L, "TASK01"),
-                                    task(2L, "TASK02"),
-                                    task(3L, "TASK03")
-                            )
-                    );
+            Task task1 =task(1L, "task1");
+            Task task2 =task(2L, "task2");
+            Task task3 =task(3L, "task3");
+
+            taskService.save(task1);
+            taskService.save(task2);
+            taskService.save(task3);
 
             mockMvc.perform(get("/tasks"))
                     .andExpect(status().isOk())
                     .andExpect(view().name("tasks/int_list"))
                     .andExpect(model().attributeExists("tasks"))
                     .andExpect(model().attribute("tasks", hasSize(3)))
-                    .andExpect(model().attribute("tasks", hasItem(task(1L, "TASK01"))))
-                    .andExpect(model().attribute("tasks", hasItem(task(2L, "TASK02"))))
-                    .andExpect(model().attribute("tasks", hasItem(task(3L, "TASK03"))));
+                    .andExpect(model().attribute("tasks", hasItem(task(1L, "task1"))))
+                    .andExpect(model().attribute("tasks", hasItem(task(2L, "task2"))))
+                    .andExpect(model().attribute("tasks", hasItem(task(3L, "task3"))));
         }
 
     }

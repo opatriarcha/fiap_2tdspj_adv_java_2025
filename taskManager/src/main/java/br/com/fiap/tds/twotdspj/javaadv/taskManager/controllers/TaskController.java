@@ -55,23 +55,27 @@ public class TaskController {
 
     @GetMapping("/view/{id}")
     public String viewTask(@PathVariable("id") Long id, Model model){
-        Task task = this.taskService.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Task not found " + id.toString()
-            )
-        );
+        Task task = this.taskService.findById(id).orElse(null);
+        model.addAttribute("task", task);
+        if(task == null)
+            return "redirect:/tasks";
         model.addAttribute("task", task);
         return "tasks/int_view";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Long id, Model model){
-        Task newTask = this.taskService.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Task not found " + id.toString()
-                )
-        );
-        model.addAttribute("task", newTask);
-        model.addAttribute("statuses", TaskStatus.values());
-        model.addAttribute("priorities", TaskPriority.values());
-        return "tasks/int_form";
+        Task newTask = this.taskService.findById(id).orElse(null);
+        if( newTask == null) {
+            model.addAttribute("task", new Task());
+            return "tasks/int_form";
+        } else {
+            model.addAttribute("task", newTask);
+            model.addAttribute("statuses", TaskStatus.values());
+            model.addAttribute("priorities", TaskPriority.values());
+            return "tasks/int_form";
+        }
+
     }
 }
+
